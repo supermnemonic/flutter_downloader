@@ -859,6 +859,12 @@ static BOOL debug = YES;
         if (debug) {
             NSLog(@"Unknown transfer size");
         }
+        NSString *taskId = [self identifierForTask:downloadTask];
+        [self sendUpdateProgressForTaskId:taskId inStatus:@(STATUS_RUNNING) andProgress:@(-1)];
+        __typeof__(self) __weak weakSelf = self;
+        dispatch_sync(databaseQueue, ^{
+            [weakSelf updateTask:taskId status:STATUS_RUNNING progress:-1];
+        });
     } else {
         NSString *taskId = [self identifierForTask:downloadTask];
         int progress = round(totalBytesWritten * 100 / (double)totalBytesExpectedToWrite);
